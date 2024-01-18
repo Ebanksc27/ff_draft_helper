@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cron = require('node-cron');
+const cors = require('cors');
 const fetchAndStoreNFLPlayers = require('./fetchPlayers'); 
 const db = require('./db');
 const playerRoutes = require('./routes/players');
@@ -10,6 +11,9 @@ const rankingsRoutes = require('./routes/rankings');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Enable CORS for all routes
+app.use(cors());
 
 // Middleware to parse JSON bodies
 app.use(express.json());

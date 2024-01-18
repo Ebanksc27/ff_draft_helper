@@ -43,7 +43,10 @@ router.post('/login', async (req, res) => {
   
           // User is authenticated, create token
           const token = jwt.sign(
-            { user_id: user.rows[0].user_id },
+            { 
+              user_id: user.rows[0].user_id, 
+              username: user.rows[0].username 
+            },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
           );
@@ -52,7 +55,7 @@ router.post('/login', async (req, res) => {
           res.json({ token });
         } else {
           // Password is incorrect, send an error response
-          res.status(400).json({ error: 'Invalid credentials' });
+          res.status(400).json({ error: 'Invalid password' });
         }
       } else {
         // No user found with that email, send an error response
