@@ -1,6 +1,7 @@
 const request = require('supertest');
 const express = require('express');
 const playersRoute = require('./players');
+const db = require('../db');
 
 const app = express();
 app.use(express.json());
@@ -28,5 +29,38 @@ describe('Players Route', () => {
         })
       ])
     );
+  });
+});
+
+describe('Players Route with Search', () => {
+  test('GET /api/players with search query should return filtered players', async () => {
+    // Mock the database response for a specific search query
+    db.query.mockResolvedValueOnce({
+      rows: [{ player_id: 2, name: 'Tom Brady', position: 'QB', team_id: 'TB', status: 'Active' }]
+    });
+
+    const response = await request(app).get('/api/players?search=tom');
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          player_id: 2,
+          name: 'Tom Brady',
+          position: 'QB',
+          team_id: 'TB',
+          status: 'Active'
+        })
+      ])
+    );
+    expect(response.body).toHaveLength(1); // Expect only one player in the response
+  });
+
+  test('GET /api/players with search query for non-existing player should return empty array', async () => {
+    // Mock an empty response for a non-matching search query
+    db.query.mockResolvedValueOnce({ rows: [] });
+
+    const response = await request(app).get('/api/players?search=nonexistingplayer');
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual([]); // Expect an empty array
   });
 });
