@@ -8,21 +8,34 @@ const getAuthToken = () => {
 };
 
 const fetchPlayers = async (searchTerm) => {
-    const token = localStorage.getItem('token'); // Retrieve the JWT token from local storage
+    const token = getAuthToken(); // Retrieve the JWT token using getAuthToken
     const headers = {
       Authorization: `Bearer ${token}`, // Set the Authorization header with the token
     };
   
     try {
-        console.log('Authorization header:', headers);
       const response = await axios.get(`${BASE_URL}/players?name=${encodeURIComponent(searchTerm)}`, { headers });
       return response.data;
     } catch (error) {
       console.error('Error fetching players:', error);
       throw error;
     }
-  };
+};
 
-export { fetchPlayers, getAuthToken };
+const getFavorites = async (userId) => {
+    const token = getAuthToken(); // Use getAuthToken to retrieve the JWT token
+    try {
+        const response = await axios.get(`${BASE_URL}/api/favorites/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return response.data; 
+    } catch (error) {
+        console.error('Error fetching favorites:', error);
+        throw error;
+    }
+};
+
+export { fetchPlayers, getFavorites, getAuthToken };
+
 
 

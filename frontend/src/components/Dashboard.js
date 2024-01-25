@@ -1,5 +1,6 @@
 import React from 'react';
 import { isLoggedIn, getUsername } from '../services/auth';
+import FavoritesList from './favoritesList'; // Make sure the path is correct
 
 const Dashboard = () => {
   const username = getUsername(); 
@@ -10,6 +11,7 @@ const Dashboard = () => {
       {isLoggedIn() ? (
         <div>
           <h2>Your Dashboard</h2>
+          <FavoritesList />
           {/* More personalized components */}
         </div>
       ) : (
@@ -26,4 +28,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
