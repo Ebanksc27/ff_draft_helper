@@ -5,7 +5,7 @@ import theme from './theme';
 import Header from './components/Header';
 import LoginForm from './components/auth/loginForm'; 
 import RegisterForm from './components/auth/registerForm'; 
-import DraftList from './components/drafts/draftList'; 
+import DraftBoard from './components/drafts/draftboard'; 
 import Dashboard from './components/Dashboard';
 import PlayerList from './components/playerList';
 import { isLoggedIn } from './services/auth';
@@ -19,7 +19,7 @@ function App() {
           <Route path="/" element={isLoggedIn() ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
-          <Route path="/drafts" element={<DraftList />} />
+          <Route path="/drafts" element={<DraftBoard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/players" element={<PlayerList />} />
           {/* Add more routes as needed */}

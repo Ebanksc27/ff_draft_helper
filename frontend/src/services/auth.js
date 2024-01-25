@@ -18,7 +18,7 @@ export const getUsername = () => {
   if (token) {
     try {
       const decoded = jwtDecode(token);
-      return decoded.username; // Make sure 'username' matches the token payload property
+      return decoded.username; 
     } catch (error) {
       console.error('Error decoding token:', error);
       return null;

@@ -8,6 +8,8 @@ const playerRoutes = require('./routes/players');
 const userRoutes = require('./routes/users');
 const draftRoutes = require('./routes/drafts');
 const rankingsRoutes = require('./routes/rankings');
+const favoritesRoutes = require('./routes/favorites'); 
+const draftboardRoutes = require('./routes/draftboards');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -30,6 +32,12 @@ app.use('/api/drafts', draftRoutes);
 // Rankings routes
 app.use('/api/rankings', rankingsRoutes);
 
+// Favorites routes
+app.use('/api/favorites', favoritesRoutes);
+
+// Draftboards routes
+app.use('/api/draftboards', draftboardRoutes);
+
 // Test database connection
 db.query('SELECT NOW()', (err, res) => {
   if (err) throw err;
@@ -41,7 +49,6 @@ cron.schedule('15 15 * * *', () => {
     console.log('Running a daily task to fetch and store NFL players');
     fetchAndStoreNFLPlayers();
 }); 
-
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -63,3 +70,4 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+

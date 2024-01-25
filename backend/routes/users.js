@@ -28,44 +28,53 @@ router.post('/register', async (req, res) => {
 
 // POST /api/users/login
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-      // Retrieve user from the database
-      const user = await db.query('SELECT * FROM users WHERE email = $1', [email]);
-  
-      if (user.rows.length > 0) {
-        // Compare the provided password with the stored hash
-        const isValid = await bcrypt.compare(password, user.rows[0].password_hash);
-  
-        if (isValid) {
-          // Debugging: Log the JWT Secret to the console
-          console.log('JWT Secret:', process.env.JWT_SECRET);
-  
-          // User is authenticated, create token
-          const token = jwt.sign(
-            { 
-              user_id: user.rows[0].user_id, 
-              username: user.rows[0].username 
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }
-          );
-  
-          // Send the token as a response
-          res.json({ token });
-        } else {
-          // Password is incorrect, send an error response
-          res.status(400).json({ error: 'Invalid password' });
-        }
+  const { email, password } = req.body;
+  try {
+    // Retrieve user from the database
+    const userResult = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+
+    if (userResult.rows.length > 0) {
+      const user = userResult.rows[0];
+
+      // Log user data to console to verify
+      console.log("User data:", user);
+
+      // Compare the provided password with the stored hash
+      const isValid = await bcrypt.compare(password, user.password_hash);
+
+      if (isValid) {
+        // Log the JWT payload to console to verify
+        const payload = {
+          user_id: user.user_id,
+          username: user.username
+        };
+        console.log("JWT Payload:", payload);
+
+        // User is authenticated, create token
+        const token = jwt.sign(
+          payload,
+          process.env.JWT_SECRET,
+          { expiresIn: '1h' }
+        );
+
+        console.log("Generated JWT Token:", token);
+
+        // Send the token as a response
+        res.json({ token });
       } else {
-        // No user found with that email, send an error response
-        res.status(404).json({ error: 'User not found' });
+        // Password is incorrect, send an error response
+        res.status(400).json({ error: 'Invalid password' });
       }
-    } catch (error) {
-      // Handle errors
-      res.status(500).json({ error: error.message });
+    } else {
+      // No user found with that email, send an error response
+      res.status(404).json({ error: 'User not found' });
     }
-  });
+  } catch (error) {
+    // Handle errors
+    res.status(500).json({ error: error.message });
+  }
+});
+
   
 
 module.exports = router;

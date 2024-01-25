@@ -4,7 +4,6 @@ import PlayerCard from './playerCard';
 import { TextField, Button, Box } from '@mui/material';
 
 const PlayerList = () => {
-  // State to store player data, loading status, error messages, and search query
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -12,29 +11,39 @@ const PlayerList = () => {
 
   // Fetch player data based on search query
   const fetchPlayers = async () => {
-    // Check if search query is empty, return early if true
     if (!searchQuery.trim()) return;
+    
+    const token = localStorage.getItem('token'); // Retrieve the token from local storage
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
 
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:3000/api/players?name=${searchQuery}`);
-      setPlayers(response.data); // Update player data with response
+      const response = await axios.get(`http://localhost:3000/api/players?name=${searchQuery}`, { headers });
+      setPlayers(response.data); // Update player data with response, including isFavorite status
     } catch (err) {
-      setError(err.message); 
+      setError(err.message || 'Failed to fetch players.');
     } finally {
-      setLoading(false); // Ensure loading state is false after fetch
+      setLoading(false);
     }
+  };
+
+  // Handle favorite status update
+  const updateFavoriteStatus = (playerId, newStatus) => {
+    setPlayers(players.map(player =>
+      player.player_id === playerId ? { ...player, isFavorite: newStatus } : player
+    ));
   };
 
   // Handler for search form submission
   const handleSearch = (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
-    fetchPlayers(); // Call fetchPlayers to perform the search
+    e.preventDefault();
+    fetchPlayers();
   };
 
   return (
     <div>
-      {/* Search form */}
       <Box component="form" onSubmit={handleSearch} sx={{ mb: 2 }}>
         <TextField
           label="Search Players"
@@ -46,18 +55,13 @@ const PlayerList = () => {
         <Button type="submit" variant="contained">Search</Button>
       </Box>
 
-      {/* Conditional rendering based on state */}
       {loading && <div>Loading players...</div>}
       {error && <div>Error fetching players: {error}</div>}
       {!loading && !error && players.map((player) => (
-        <PlayerCard key={player.player_id} player={player} />
+        <PlayerCard key={player.player_id} player={player} updateFavoriteStatus={updateFavoriteStatus} />
       ))}
     </div>
   );
 };
 
 export default PlayerList;
-
-
-
-

@@ -13,14 +13,18 @@ const registerUser = async (userData) => {
 };
 
 const loginUser = async (credentials) => {
-  try {
-    const response = await axios.post(`${BASE_URL}/login`, credentials);
-    return response.data;
-  } catch (error) {
-    console.error('Error logging in:', error);
-    throw error;
-  }
-};
+    try {
+      const response = await axios.post(`${BASE_URL}/login`, credentials);
+      const { token } = response.data;
+      if (token) {
+        localStorage.setItem('token', token); // Store the token
+      }
+      return response.data;
+    } catch (error) {
+      console.error('Error logging in:', error);
+      throw error;
+    }
+  };
 
 // Add other user-related functions as needed
 

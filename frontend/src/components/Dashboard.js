@@ -14,7 +14,10 @@ const Dashboard = () => {
         </div>
       ) : (
         <div>
-          <p>Manage your fantasy football drafts with ease.</p>
+          <p>Manage your fantasy football drafts with ease!
+            - Search for players in the Players tab and add them to your favorites list! 
+            - Head to the Draftboard to create a ranked list of up to ten players at each position!
+          </p>
           {/* Calls to action for Sign Up or Learn More */}
         </div>
       )}

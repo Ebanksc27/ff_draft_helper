@@ -1,27 +1,53 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Card, CardContent, Typography, Button, Box, Modal } from '@mui/material';
+import { jwtDecode } from 'jwt-decode';
 
-const PlayerCard = ({ player }) => {
+const PlayerCard = ({ player, updateFavoriteStatus }) => {
   const [openModal, setOpenModal] = useState(false);
 
-  // Function to handle opening the modal
+  // Display 'Free Agent' or 'N/A' if team_id is null
+  const displayTeam = player.team_id ? player.team_id : 'Free Agent';
+
   const handleOpenModal = () => {
     setOpenModal(true);
   };
 
-  // Function to handle closing the modal
   const handleCloseModal = () => {
     setOpenModal(false);
   };
 
-  // Placeholder function for handling the favorite action
-  const handleFavorite = (event, playerId) => {
-    event.stopPropagation(); // Prevents the modal from opening when clicking on the favorite button
-    console.log(`Favorite player: ${playerId}`);
-    // Implement favorite logic here
-  };
+  const handleFavorite = async (event, playerId) => {
+    event.stopPropagation();
 
-  // Extract the stats from the player data
+    const token = localStorage.getItem('token');
+    let userId;
+
+    try {
+        const decoded = jwtDecode(token);
+        userId = decoded.user_id; 
+    } catch (error) {
+        console.error('Error decoding token:', error);
+        return; // Exit if token cannot be decoded
+    }
+
+    try {
+        const url = `http://localhost:3000/api/favorites/${userId}`;
+        const headers = { Authorization: `Bearer ${token}` };
+
+        if (player.isFavorite) {
+            await axios.delete(`${url}/${playerId}`, { headers });
+        } else {
+            await axios.post(url, { playerId }, { headers });
+        }
+        updateFavoriteStatus(playerId, !player.isFavorite);
+    } catch (error) {
+        console.error('Error updating favorite status:', error);
+    }
+};
+
+  
+
   const { age, height, weight, college } = player.stats;
 
   return (
@@ -29,14 +55,15 @@ const PlayerCard = ({ player }) => {
       <Card variant="outlined" sx={{ mb: 2 }} onClick={handleOpenModal}>
         <CardContent>
           <Typography variant="h5">{player.name}</Typography>
-          <Typography color="textSecondary">{player.position} - {player.team_id}</Typography>
+          <Typography color="textSecondary">{player.position} - {displayTeam}</Typography>
           {/* Display additional player details */}
           <Box sx={{ mt: 2 }}>
             <Typography variant="body2">Status: {player.status}</Typography>
           </Box>
         </CardContent>
-        {/* Placeholder for favorite button */}
-        <Button size="small" onClick={(event) => handleFavorite(event, player.player_id)}>Favorite</Button>
+        <Button size="small" onClick={(event) => handleFavorite(event, player.player_id)}>
+          {player.isFavorite ? 'Unfavorite' : 'Favorite'}
+        </Button>
       </Card>
 
       {/* Modal for player details */}
@@ -61,7 +88,7 @@ const PlayerCard = ({ player }) => {
             {player.name}
           </Typography>
           <Typography sx={{ mt: 2 }}>
-            Team: {player.team_id}
+            Team: {displayTeam}
           </Typography>
           <Typography>
             Position: {player.position}
@@ -81,7 +108,6 @@ const PlayerCard = ({ player }) => {
           <Typography>
             College: {college}
           </Typography>
-          {/* Close button for the modal */}
           <Button onClick={handleCloseModal}>Close</Button>
         </Box>
       </Modal>

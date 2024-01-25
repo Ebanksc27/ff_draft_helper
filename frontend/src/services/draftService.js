@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const BASE_URL = 'http://localhost:3000'; 
 
-// Get all drafts
+// Get all drafts (Future implement)
 const getDrafts = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/drafts`);
@@ -13,7 +13,7 @@ const getDrafts = async () => {
   }
 };
 
-// Create a new draft
+// Create a new draft (future implement)
 const createDraft = async (draftData) => {
   try {
     const response = await axios.post(`${BASE_URL}/drafts/create`, draftData);
@@ -24,7 +24,7 @@ const createDraft = async (draftData) => {
   }
 };
 
-// Get draft details by ID
+// Get draft details by ID (future implement)
 const getDraftDetails = async (draftId) => {
   try {
     const response = await axios.get(`${BASE_URL}/drafts/${draftId}`);
@@ -35,5 +35,37 @@ const getDraftDetails = async (draftId) => {
   }
 };
 
-export { getDrafts, createDraft, getDraftDetails };
-
+// Fetch draftboard data
+const getDraftboard = async (userId) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`${BASE_URL}/api/draftboards/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching draftboard:', error);
+      throw error;
+    }
+  };  
+  
+  // Update draftboard data
+  const updateDraftboard = async (userId, draftboardData) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.put(`${BASE_URL}/api/draftboards/${userId}`, draftboardData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error updating draftboard:', error);
+      throw error;
+    }
+  };
+  
+  
+  export { getDrafts, createDraft, getDraftDetails, getDraftboard, updateDraftboard };
